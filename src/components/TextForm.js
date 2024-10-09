@@ -12,11 +12,13 @@ export default function TextForm(Props) {
     const newtext = text.toUpperCase();
     setText(newtext);
     //console.log("Button pressed");
+    Props.showAlert("Success Converted to UpperCase", "success");
   };
 
   const handleOnClickl = () => {
     const newtext = text.toLowerCase();
     setText(newtext);
+    Props.showAlert("Success Converted to LowerCase", "success");
     //console.log("Button pressed");
   };
 
@@ -47,16 +49,45 @@ export default function TextForm(Props) {
     status.textContent = "";
   };
 
+  function correctPunctuation() {
+    // Trim leading and trailing spaces
+    let correctedText = text.trim();
+
+    // Correct common punctuation mistakes
+    // 1. Ensure space after punctuation (.,!?:;)
+    correctedText = correctedText.replace(/([.,!?:;])([^\s])/g, "$1 $2");
+
+    // 2. Remove spaces before punctuation
+    correctedText = correctedText.replace(/\s+([.,!?:;])/g, "$1");
+
+    // 3. Remove multiple spaces with a single space
+    correctedText = correctedText.replace(/\s{2,}/g, " ");
+
+    // 4. Capitalize first letter of the sentence (if not already capitalized)
+    correctedText = correctedText.replace(/(^\s*\w|\.\s*\w)/g, function (txt) {
+      return txt.toUpperCase();
+    });
+
+    setText(correctedText);
+    Props.showAlert("Success Corrected the Punctuation", "success");
+  }
+
   return (
     <div>
       <div className="mb-3 container">
-        <h1>{Props.heading}</h1>
+        <h1 style={{ color: Props.mode === "dark" ? "white" : "black" }}>
+          {Props.heading}
+        </h1>
         <textarea
-          class="form-control mb-3"
+          className="form-control mb-3"
           id="MyBox"
           value={text}
           onChange={handleOnChange}
           rows="8"
+          style={{
+            background: Props.mode === "dark" ? "#242425" : "white",
+            color: Props.mode === "dark" ? "white" : "black",
+          }}
         ></textarea>
         <button className="btn btn-primary mx-2" onClick={handleOnClick}>
           Convert to uppercase
@@ -64,6 +95,10 @@ export default function TextForm(Props) {
         <button className="btn btn-primary mx-2" onClick={handleOnClickl}>
           Convert to LowerCase
         </button>
+        <button className="btn btn-primary mx-2" onClick={correctPunctuation}>
+          Correct Punctuation
+        </button>
+
         <button
           className="btn btn-primary mx"
           id="speakButton"
@@ -71,15 +106,22 @@ export default function TextForm(Props) {
         >
           Speak Button
         </button>
-        <h1>Text Summary</h1>
-        <p>Number of words: {text.split(" ").length}</p>
-        <p>Number of characters: {text.length}</p>
-        <p>
-          Time required to Read the Document {text.split(" ").length * 0.008}{" "}
-          mins
-        </p>
-        <p id="status"></p>
-        <p>{text}</p>
+        <div style={{ color: Props.mode === "dark" ? "white" : "black" }}>
+          <h1>Text Summary</h1>
+          <p>Number of words: {text.split(" ").length}</p>
+          <p>Number of characters: {text.length}</p>
+          <p>
+            Time required to Read the Document {text.split(" ").length * 0.008}{" "}
+            mins
+          </p>
+          <h1 id="status">Preview</h1>
+
+          <p>
+            {text.length > 0
+              ? text
+              : "Enter some text in the Box Above to Preview it"}
+          </p>
+        </div>
       </div>
     </div>
   );
